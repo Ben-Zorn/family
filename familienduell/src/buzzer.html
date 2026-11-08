@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#06102b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Familien-Duell – Buzzer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="join hidden" id="join">
+  <h1>Familien-Duell Buzzer</h1>
+  <label>Raumcode (steht oben auf dem Laptop)<br><input id="roomIn" maxlength="4" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;width:100%"></label>
+  <div class="teampick"><button class="a" data-team="0">Team A</button><button class="b" data-team="1">Team B</button></div>
+  <button class="gold" id="joinBtn">Verbinden</button>
+</div>
+
+<div class="buzz-body st-idle hidden" id="pad">
+  <div class="buzz-head">
+    <span class="buzz-team" id="teamName">…</span>
+    <span id="connInfo" class="muted">verbinde …</span>
+  </div>
+  <button id="buzzBtn">Warten</button>
+  <div class="buzz-msg" id="msg">Verbinde mit dem Spiel …</div>
+  <div class="buzz-foot" id="foot">Bildschirm anlassen &amp; diese Seite im Vordergrund lassen.</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script src="common.js"></script>
+<script src="buzzer.js"></script>
+</body>
+</html>
