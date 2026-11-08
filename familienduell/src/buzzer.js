@@ -97,9 +97,21 @@ function connect() {
   });
   c.on('error', () => {});
 }
-setInterval(() => { // watchdog: no pong for a while -> reconnect
-  if (conn && conn.open && samples.length && performance.now() - samples[samples.length - 1].at > 6000) { try { conn.close(); } catch (e) {} }
+// Full teardown + fresh Peer. A phone that was locked/backgrounded often keeps a dead signaling socket and
+// stale WebRTC channel that never fire 'close', so a soft reconnect can hang forever – start from scratch instead.
+function hardReset() {
+  clearTimeout(reconnectTimer); clearTimeout(pingTimer);
+  const oldPeer = peer; conn = null; peer = null;
+  try { oldPeer && oldPeer.destroy(); } catch (e) {}
+  $('#connInfo').textContent = 'verbinde …';
+  setState('locked', 'Offline', 'Verbinde neu …');
+  start();
+}
+setInterval(() => { // watchdog: no pong for a while -> full reset
+  if (conn && conn.open && samples.length && performance.now() - samples[samples.length - 1].at > 6000) hardReset();
 }, 2000);
+window.addEventListener('online', hardReset);
+window.addEventListener('pageshow', e => { if (e.persisted) hardReset(); });
 
 // ======================= Buzz logic =======================
 let state = 'idle', armId = null, goLocal = 0, shownAt = 0, lockUntil = 0, penaltyMs = 1000, buzzedId = null, rafId = null;
@@ -191,7 +203,12 @@ async function requestWakeLock() {
   try { if ('wakeLock' in navigator && !wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => wakeLock = null); } } catch (e) {}
 }
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') { requestWakeLock(); if (conn && !conn.open) connect(); else if (conn) startPinging(); }
+  if (document.visibilityState !== 'visible') return;
+  requestWakeLock();
+  const last = samples.length ? samples[samples.length - 1].at : 0;
+  // after a screen lock the old connection is usually dead even if it still says "open"
+  if (!conn || !conn.open || performance.now() - last > 3000) hardReset();
+  else startPinging();
 });
 
 // ---------- join screen ----------
