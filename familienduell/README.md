@@ -84,3 +84,31 @@ out too, swap phones between rounds.
   directly between the devices. So you need some internet at setup; best is all devices on the same Wi-Fi (or the laptop's/a phone's hotspot).
 - Keep the buzzer pages in the foreground with the screen on (the page asks for a wake lock after the first tap).
 - If a buzzer shows "Offline", it reconnects by itself; reloading the page also works.
+
+## Deployment (this setup)
+
+The source lives in the `family` repo; the live site is served by GitHub Pages from a separate repo,
+`Ben-Zorn/family-host` (branch `main`, root) at `https://ben-zorn.github.io/family-host/`.
+Only the built `site/` folder is published there – never `src/` or this README (they'd expose the questions and password).
+
+One-time setup:
+
+```bash
+git clone git@github.com:Ben-Zorn/family-host.git ~/sources/family-host
+```
+
+Every update:
+
+```bash
+# 1. edit src/, then rebuild (rewrites site/)
+cd ~/sources/family/familienduell && node build.js <password>
+
+# 2. commit the source change in the family repo
+cd ~/sources/family && git add -A && git commit -m "Update familienduell" && git push
+
+# 3. publish the built site
+cp -r ~/sources/family/familienduell/site/* ~/sources/family-host/
+cd ~/sources/family-host && git add -A && git commit -m "Update site" && git push
+```
+
+Pages redeploys within about a minute. Don't run `git init` inside `site/` (it is tracked by the `family` repo).
