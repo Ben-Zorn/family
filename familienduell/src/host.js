@@ -59,7 +59,7 @@ function nextQuestion(skip = false) {
     if (S.round < 1) S.round = 1;
     S.q = { id: q.id, text: q.q, topic: q.topic, tone: q.tone };
     S.answers = q.answers.map(a => ({ a: a.a, p: a.p, st: 0 }));
-    S.phase = 'faceoff'; S.control = null; S.strikes = 0; S.award = null; S.buzz = null;
+    S.phase = 'faceoff'; S.control = null; S.strikes = 0; S.award = null; S.buzz = null; S.qShown = false;
   });
 }
 function skipQuestion() {
@@ -174,6 +174,7 @@ setInterval(() => { // drop stale
 // time, it never decides the winner.
 let armSeq = 0, armState = null, goSoundTimer = null;
 function arm() {
+  if (S.q && !S.qShown) { S.qShown = true; save(); renderAll(); } // question appears on the board only once buzzers are released
   const cl = [...clients.values()];
   if (!cl.length) { alert('Kein Buzzer verbunden.'); return; }
   disarm(true);
@@ -253,6 +254,7 @@ function renderAll() {
   $('#answers').innerHTML = (S.answers.length ? S.answers : []).map((a, i) =>
     `<button class="st${a.st}" data-i="${i}"><span class="txt">${i + 1}. ${show || a.st ? esc(a.a) : '<span class="veil">●●●●●●</span>'}</span><b>${show || a.st ? a.p : ''}</b></button>`).join('')
     || '<span class="muted">Noch keine Frage – „Neue Frage“ drücken.</span>';
+  $('#gmQ').textContent = S.q ? S.q.text : '–';
   $('#btnPeek').classList.toggle('active', peekActive);
   const ph = S.phase, act = ACTIVE.includes(ph);
   $('#btnCtrlA').textContent = `${S.teams[0]} spielt`; $('#btnCtrlB').textContent = `${S.teams[1]} spielt`;

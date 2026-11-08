@@ -124,10 +124,10 @@ kbd{font-family:ui-monospace,monospace;font-size:.75em;background:#0008;border:1
 .st-go #buzzBtn{background:#18c25c;box-shadow:0 2vmin 0 #0006,0 0 10vmin #2f8 }
 .st-locked #buzzBtn{background:#7a1a22}
 .st-pressed #buzzBtn{background:#555}
-.st-win{background:color-mix(in srgb,var(--winCol,#d29a00) 45%,#000)!important}
-.st-lose{background:color-mix(in srgb,var(--winCol,#3a3f55) 30%,#000)!important}
-.st-win #buzzBtn{background:var(--winCol,#d29a00);color:#fff}
-.st-lose #buzzBtn{background:color-mix(in srgb,var(--winCol,#3a3f55) 55%,#222)}
+.buzz-body[data-win="0"].st-win,.buzz-body[data-win="0"].st-lose{background:#7a1f2b!important}
+.buzz-body[data-win="1"].st-win,.buzz-body[data-win="1"].st-lose{background:#10506f!important}
+.st-win #buzzBtn,.st-lose #buzzBtn{background:var(--winCol,#d29a00);color:#fff}
+.st-lose #buzzBtn{filter:saturate(.7) brightness(.85)}
 .join{max-width:420px;margin:10vh auto;padding:1.2em;display:grid;gap:.8em;font-family:system-ui,sans-serif}
 .join h1{font-family:"Oswald",system-ui;color:var(--gold);margin:0}
 .join input,.join button{font-size:1.2em;padding:.6em}

@@ -126,11 +126,11 @@ function onMsg(m) {
     document.title = 'Buzzer – ' + m.teamName;
   }
   if (m.t === 'arm') onArm(m);
-  if (m.t === 'disarm') { cancelAnimationFrame(rafId); armId = null; state = 'idle'; setState('idle', 'Warten', 'Gesperrt – warte auf Freigabe …'); }
+  if (m.t === 'disarm') { cancelAnimationFrame(rafId); delete pad.dataset.win; armId = null; state = 'idle'; setState('idle', 'Warten', 'Gesperrt – warte auf Freigabe …'); }
   if (m.t === 'result') onResult(m);
 }
 function onArm(m) {
-  cancelAnimationFrame(rafId);
+  cancelAnimationFrame(rafId); delete pad.dataset.win;
   armId = m.id; penaltyMs = m.penaltyMs ?? 1000; buzzedId = null; lockUntil = 0;
   goLocal = m.goHost - offset;            // the shared GO instant, in this phone's clock
   state = 'ready';
@@ -181,6 +181,7 @@ function onResult(m) {
   const w = m.list[0];
   const col = m.winnerTeam === 0 ? 'var(--teamA)' : 'var(--teamB)';
   document.documentElement.style.setProperty('--winCol', col); // winner's colour on every phone
+  pad.dataset.win = m.winnerTeam === 0 ? '0' : '1';
   if (m.winner === cid) {
     state = 'win'; setState('win', 'Erster!', `${fmtMs(me.rt)}${m.list[1] ? ` · ${Math.round(m.list[1].rt - me.rt)} ms schneller` : ''}`);
     navigator.vibrate?.([120, 60, 120]);

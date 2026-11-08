@@ -109,7 +109,7 @@ function createBoard(root) {
     if (s.phase === 'idle' || !s.q) {
       el.q.innerHTML = '<div class="b-logo">FAMILIEN-DUELL</div>';
     } else {
-      el.q.textContent = s.showQ ? s.q.text : '';
+      el.q.textContent = s.showQ && s.qShown ? s.q.text : '';
     }
     let st = '';
     const tn = t => esc(s.teams[t]);
