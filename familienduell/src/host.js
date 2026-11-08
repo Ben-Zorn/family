@@ -183,12 +183,11 @@ function arm() {
   disarm(true);
   const maxRtt = Math.max(60, ...cl.map(c => c.rttMed || 250));
   const minLead = maxRtt * 1.5 + 200;
-  const lead = settings.armMode === 'random' ? Math.max(minLead, 1000 + Math.random() * 1500) : Math.max(minLead, 450);
+  const lead = minLead; // no warning phase: GO comes as soon as the slowest buzzer's ping allows
   const goHost = performance.now() + lead;
   armState = { id: ++armSeq, goHost, expected: new Set(cl.map(c => c.cid)), buzzes: [], decided: false, timer: null, maxRtt, falses: [] };
   broadcast({ t: 'arm', id: armState.id, goHost, penaltyMs: settings.penaltyMs });
   boardEvent({ ev: 'arm', goEpoch: performance.timeOrigin + goHost });
-  Snd.ready();
   goSoundTimer = setTimeout(() => Snd.go(), lead);
   $('#buzzRes').textContent = 'Warte auf LOS …';
   if (S.buzz) { S.buzz = null; save(); renderAll(); }
@@ -303,22 +302,18 @@ $('#btnQR').onclick = () => {
 
 $('#btnSettings').onclick = () => {
   $('#teamA').value = S.teams[0]; $('#teamB').value = S.teams[1];
-  document.querySelectorAll('input[name=armMode]').forEach(r => r.checked = r.value === settings.armMode);
-  $('#penalty').value = settings.penaltyMs; $('#showQ').checked = settings.showQ; $('#peekAlways').checked = settings.peekAlways;
+  $('#showQ').checked = settings.showQ; $('#peekAlways').checked = settings.peekAlways;
   openModal('#mSettings');
 };
 function applySettings() {
   const tA = $('#teamA').value.trim() || 'Team A', tB = $('#teamB').value.trim() || 'Team B';
   settings.teams = [tA, tB];
-  settings.armMode = document.querySelector('input[name=armMode]:checked')?.value || 'random';
-  settings.penaltyMs = Math.max(0, parseInt($('#penalty').value, 10) || 0);
   settings.showQ = $('#showQ').checked; settings.peekAlways = $('#peekAlways').checked;
   saveSettings();
   S.teams = [tA, tB]; S.showQ = settings.showQ; save(); renderAll(); renderClients();
   for (const c of clients.values()) sendWelcome(c);
 }
-['#teamA', '#teamB', '#penalty', '#showQ', '#peekAlways'].forEach(id => $(id).addEventListener('change', applySettings));
-document.querySelectorAll('input[name=armMode]').forEach(r => r.addEventListener('change', applySettings));
+['#teamA', '#teamB', '#showQ', '#peekAlways'].forEach(id => $(id).addEventListener('change', applySettings));
 $('#btnNewGame').onclick = () => { if (confirm('Neues Spiel starten? Punkte werden auf 0 gesetzt (gespielte Fragen bleiben gesperrt).')) { undoStack = []; S = newGame(); save(); renderAll(); $('#mSettings').classList.add('hidden'); } };
 $('#btnNewRoom').onclick = () => {
   if (!confirm('Neuen Raumcode erzeugen? Die Buzzer müssen sich danach neu verbinden.')) return;

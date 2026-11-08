@@ -164,7 +164,7 @@ function createBoard(root) {
     if (ev.ev === 'arm') {
       clearTimeout(goTimer);
       const goLocal = ev.goEpoch - performance.timeOrigin;
-      overlay('ACHTUNG …', 'Buzzer bereit machen', 'var(--gold)', 0);
+      hideOverlay();
       const tick = () => {
         if (performance.now() >= goLocal) { overlay('LOS!', '', 'var(--ok)', 900); return; }
         goTimer = requestAnimationFrame(tick);

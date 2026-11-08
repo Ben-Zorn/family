@@ -134,7 +134,7 @@ function onArm(m) {
   armId = m.id; penaltyMs = m.penaltyMs ?? 1000; buzzedId = null; lockUntil = 0;
   goLocal = m.goHost - offset;            // the shared GO instant, in this phone's clock
   state = 'ready';
-  setState('ready', 'Achtung', 'Gleich geht’s los … noch NICHT drücken!');
+  setState('idle', 'Warten', 'Gleich …'); // no yellow warning screen; GO appears at the synced instant
   const myArm = armId;
   const spin = () => {
     if (armId !== myArm || state !== 'ready') return;
@@ -157,14 +157,8 @@ function showGo() {
 }
 function press(ts) {
   if (!conn || !conn.open) return;
-  if (state === 'ready') {
-    lockUntil = ts + penaltyMs;
-    try { conn.send({ t: 'false', id: armId }); } catch (e) {}
-    setState('locked', 'Zu früh!', `Fehlstart – ${(penaltyMs / 1000).toLocaleString('de-DE')} s gesperrt`);
-    setTimeout(() => { if (state === 'ready') setState('ready', 'Achtung', 'Gleich geht’s los …'); }, Math.max(0, lockUntil - performance.now()));
-    navigator.vibrate?.(200);
-    return;
-  }
+  if (state === 'ready') return; // GO not shown yet (only the short ping-compensation lead) – ignore
+
   if (state === 'go' && buzzedId !== armId) {
     if (ts < lockUntil || ts < shownAt) return;
     buzzedId = armId; state = 'pressed';
