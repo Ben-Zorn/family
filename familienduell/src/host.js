@@ -12,7 +12,7 @@ let settings = Object.assign({
   teams: ['Team Rot', 'Team Blau'], topicsOff: {}, tones: { family: true, cheeky: true, adult: true },
   showQ: true, armMode: 'random', penaltyMs: 1000, peekAlways: false,
 }, load(LS.settings) || {});
-const newGame = () => ({ teams: [...settings.teams], scores: [0, 0], phase: 'idle', round: 0, mult: 1, q: null, answers: [], control: null, strikes: 0, award: null, buzz: null, showQ: settings.showQ });
+const newGame = () => ({ teams: [...settings.teams], scores: [0, 0], phase: 'idle', round: 0, mult: 1, q: null, answers: [], control: null, strikes: 0, award: null, buzz: null, showQ: settings.showQ, history: [] });
 let S = load(LS.game) || newGame();
 let undoStack = [];
 
@@ -54,6 +54,7 @@ function nextQuestion(skip = false) {
   const q = p[Math.floor(Math.random() * p.length)];
   played[q.id] = { t: Date.now(), how: 'played' }; savePlayed();
   disarm(true);
+  broadcast({ t: 'disarm' }); boardEvent({ ev: 'disarm' }); // reset all buzzers (colour, result) for the new question
   act(() => {
     if (!skip) S.round++;
     if (S.round < 1) S.round = 1;
@@ -67,6 +68,7 @@ function skipQuestion() {
   if (S.phase === 'done') { alert('Diese Runde ist schon gewertet – einfach „Neue Frage“ nehmen.'); return; }
   if (bankOf(S) > 0 && !confirm('Frage überspringen? Bereits aufgedeckte Punkte verfallen.')) return;
   played[S.q.id] = { t: Date.now(), how: 'skipped' }; savePlayed();
+  (S.history = S.history || []).push({ round: S.round, q: S.q.text, skipped: true });
   nextQuestion(true);
 }
 
@@ -74,6 +76,7 @@ function skipQuestion() {
 function award(t) {
   const pts = bankOf(S);
   S.scores[t] += pts; S.award = { team: t, pts }; S.phase = 'done';
+  (S.history = S.history || []).push({ round: S.round, q: S.q ? S.q.text : '', team: t, pts });
   if (pts) Snd.win();
 }
 function reveal(i) {

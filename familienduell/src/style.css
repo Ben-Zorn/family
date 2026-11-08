@@ -142,3 +142,15 @@ kbd{font-family:ui-monospace,monospace;font-size:.75em;background:#0008;border:1
 .landing .cards a{display:block;padding:1.5em 1em;border-radius:14px;background:#122463;color:#fff;text-decoration:none;font-size:1.2em;border:1px solid var(--line)}
 .landing .cards a:hover{background:#1a3290}
 .landing .cards small{display:block;color:var(--muted);font-size:.75em;margin-top:.4em}
+
+/* ---------- history ---------- */
+.b-histbtn{position:absolute;right:1.5vmin;bottom:1.2vmin;font-size:2vmin;padding:.4em .8em;opacity:.55;background:#ffffff18}
+.b-histbtn:hover{opacity:1}
+.b-history{position:absolute;inset:0;display:none;flex-direction:column;gap:2vmin;padding:4vmin 6vmin;background:#050c20f2;z-index:5}
+.b-history.show{display:flex}
+.b-history .h-head{font-size:6vmin;font-weight:700;text-align:center}
+.b-history .h-list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:1vmin}
+.b-history .h-row{display:grid;grid-template-columns:5vmin 1fr auto;gap:2vmin;align-items:baseline;font-size:2.8vmin;padding:1vmin 1.5vmin;border-radius:1.2vmin;background:#ffffff0d}
+.b-history .h-n{color:var(--gold);font-weight:700}
+.b-history .h-p{font-weight:700;white-space:nowrap}
+.b-history .h-empty,.b-history .h-hint{text-align:center;color:var(--muted);font-size:2.4vmin}

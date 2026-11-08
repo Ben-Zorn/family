@@ -69,6 +69,8 @@ function createBoard(root) {
     <div class="b-grid"></div>
     <div class="b-strikes"></div>
     <div class="b-overlay"><div class="big"></div><div class="small"></div></div>
+    <button class="b-histbtn" title="Verlauf (V)">📜 Verlauf</button>
+    <div class="b-history"><div class="h-head"></div><div class="h-list"></div><div class="h-hint">V oder Klick zum Schließen</div></div>
   </div>`;
   const el = {
     sA: $('.b-score.A', root), sB: $('.b-score.B', root),
@@ -76,6 +78,7 @@ function createBoard(root) {
     q: $('.b-question', root), status: $('.b-status', root), grid: $('.b-grid', root),
     strikes: $('.b-strikes', root), ov: $('.b-overlay', root),
     ovBig: $('.b-overlay .big', root), ovSmall: $('.b-overlay .small', root),
+    hist: $('.b-history', root), histBtn: $('.b-histbtn', root), hHead: $('.b-history .h-head', root), hList: $('.b-history .h-list', root),
   };
   const tiles = [];
   for (let i = 0; i < 8; i++) {
@@ -95,7 +98,24 @@ function createBoard(root) {
   }
   function hideOverlay() { clearTimeout(ovTimer); el.ov.classList.remove('show'); }
 
+  let lastS = null;
+  function renderHistory(s) {
+    const col = t => (t === 0 ? 'var(--teamA)' : 'var(--teamB)');
+    el.hHead.innerHTML = `<span style="color:var(--teamA)">${esc(s.teams[0])} ${s.scores[0]}</span> : <span style="color:var(--teamB)">${s.scores[1]} ${esc(s.teams[1])}</span>`;
+    const h = s.history || [];
+    el.hList.innerHTML = h.length ? h.map(e => `<div class="h-row"><span class="h-n">${e.round}</span><span class="h-q">${esc(e.q)}</span>` +
+      (e.skipped ? '<span class="h-p muted">übersprungen</span>' : `<span class="h-p" style="color:${col(e.team)}">${e.pts ? '+' + e.pts : '0'} · ${esc(s.teams[e.team])}</span>`) + '</div>').reverse().join('')
+      : '<div class="h-empty">Noch keine Runde gespielt.</div>';
+  }
+  function toggleHistory() { el.hist.classList.toggle('show'); if (lastS) renderHistory(lastS); }
+  el.histBtn.addEventListener('click', toggleHistory);
+  el.hist.addEventListener('click', toggleHistory);
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'v' || e.key === 'V') && !e.ctrlKey && !e.metaKey && !e.altKey && !/INPUT|TEXTAREA|SELECT/.test((e.target.tagName || ''))) toggleHistory();
+  });
+
   function render(s) {
+    lastS = s; if (el.hist.classList.contains('show')) renderHistory(s);
     document.body.dataset.win = s.phase === 'faceoff' && s.buzz ? String(s.buzz.team) : '';
     const teamCol = t => (t === 0 ? 'var(--teamA)' : 'var(--teamB)');
     $('.name', el.sA).textContent = s.teams[0]; $('.pts', el.sA).textContent = s.scores[0];
