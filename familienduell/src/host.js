@@ -177,9 +177,10 @@ setInterval(() => { // drop stale
 // time, it never decides the winner.
 let armSeq = 0, armState = null, goSoundTimer = null;
 function arm() {
+  const miss = missingTeams();
+  if (miss.length) { alert(`Freigabe nicht möglich – Buzzer fehlt: ${miss.map(t => S.teams[t]).join(' und ')}.`); return; }
   if (S.q && !S.qShown) { S.qShown = true; save(); renderAll(); } // question appears on the board only once buzzers are released
   const cl = [...clients.values()];
-  if (!cl.length) { alert('Kein Buzzer verbunden.'); return; }
   disarm(true);
   const maxRtt = Math.max(60, ...cl.map(c => c.rttMed || 250));
   const minLead = maxRtt * 1.5 + 200;
@@ -272,13 +273,17 @@ function renderAll() {
   $('#mult').value = String(S.mult);
   $('#qInfo').textContent = S.q ? `Runde ${S.round} · ${S.q.topic} · ${TONES[S.q.tone] || ''} · noch ${pool().length} Fragen` : `${pool().length} Fragen verfügbar`;
 }
+const missingTeams = () => [0, 1].filter(t => ![...clients.values()].some(c => c.team === t));
 function renderClients() {
   const html = [...clients.values()].sort((a, b) => a.team - b.team).map(c => {
     const ok = c.rttMed != null;
     const col = c.team === 0 ? 'var(--teamA)' : 'var(--teamB)';
     return `<span class="conn ${ok ? (c.err > 40 ? 'warn' : 'on') : 'warn'}" title="Ping (Median) / Sync-Genauigkeit"><span class="dot"></span><b style="color:${col}">${esc(S.teams[c.team])}</b> ${ok ? `${Math.round(c.rttMed)} ms · ±${Math.max(1, Math.round(c.err))} ms` : 'synchronisiere …'}</span>`;
   }).join(' ');
-  $('#clients').innerHTML = html || '<span class="muted">Keine Buzzer verbunden</span>';
+  const missing = missingTeams().map(t => `<span class="conn missing"><span class="dot"></span><b style="color:${t === 0 ? 'var(--teamA)' : 'var(--teamB)'}">${esc(S.teams[t])}</b> ⚠ BUZZER FEHLT</span>`).join(' ');
+  $('#clients').innerHTML = (html + ' ' + missing).trim();
+  const btn = $('#btnArm'); btn.disabled = missingTeams().length > 0;
+  btn.title = btn.disabled ? 'Beide Buzzer müssen verbunden sein' : '';
 }
 
 // ======================= Modals =======================
