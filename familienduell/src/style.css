@@ -157,4 +157,3 @@ kbd{font-family:ui-monospace,monospace;font-size:.75em;background:#0008;border:1
 
 .conn.missing{color:#fff;background:#b3261e;border-radius:1em;padding:.15em .7em;font-weight:700;animation:pulseMiss 1.2s infinite}
 @keyframes pulseMiss{50%{opacity:.6}}
-#btnArm:disabled{opacity:.4;cursor:not-allowed}

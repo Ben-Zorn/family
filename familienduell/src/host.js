@@ -177,10 +177,9 @@ setInterval(() => { // drop stale
 // time, it never decides the winner.
 let armSeq = 0, armState = null, goSoundTimer = null;
 function arm() {
-  const miss = missingTeams();
-  if (miss.length) { alert(`Freigabe nicht möglich – Buzzer fehlt: ${miss.map(t => S.teams[t]).join(' und ')}.`); return; }
   if (S.q && !S.qShown) { S.qShown = true; save(); renderAll(); } // question appears on the board only once buzzers are released
   const cl = [...clients.values()];
+  if (!cl.length) { alert('Kein Buzzer verbunden.'); return; }
   disarm(true);
   const maxRtt = Math.max(60, ...cl.map(c => c.rttMed || 250));
   const minLead = maxRtt * 1.5 + 200;
@@ -282,8 +281,6 @@ function renderClients() {
   }).join(' ');
   const missing = missingTeams().map(t => `<span class="conn missing"><span class="dot"></span><b style="color:${t === 0 ? 'var(--teamA)' : 'var(--teamB)'}">${esc(S.teams[t])}</b> ⚠ BUZZER FEHLT</span>`).join(' ');
   $('#clients').innerHTML = (html + ' ' + missing).trim();
-  const btn = $('#btnArm'); btn.disabled = missingTeams().length > 0;
-  btn.title = btn.disabled ? 'Beide Buzzer müssen verbunden sein' : '';
 }
 
 // ======================= Modals =======================
