@@ -86,8 +86,9 @@ function createBoard(root) {
   }
   let ovTimer = null, strikeTimer = null, goTimer = null, lastQ = null;
 
-  function overlay(big, small = '', color = '#fff', ms = 2200) {
+  function overlay(big, small = '', color = '#fff', ms = 2200, tint = null) {
     clearTimeout(ovTimer);
+    el.ov.style.background = tint ? `color-mix(in srgb, ${tint} 40%, #000)` : '';
     el.ovBig.textContent = big; el.ovBig.style.color = color; el.ovSmall.textContent = small;
     el.ov.classList.add('show');
     if (ms) ovTimer = setTimeout(() => el.ov.classList.remove('show'), ms);
@@ -95,6 +96,7 @@ function createBoard(root) {
   function hideOverlay() { clearTimeout(ovTimer); el.ov.classList.remove('show'); }
 
   function render(s) {
+    document.body.dataset.win = s.phase === 'faceoff' && s.buzz ? String(s.buzz.team) : '';
     const teamCol = t => (t === 0 ? 'var(--teamA)' : 'var(--teamB)');
     $('.name', el.sA).textContent = s.teams[0]; $('.pts', el.sA).textContent = s.scores[0];
     $('.name', el.sB).textContent = s.teams[1]; $('.pts', el.sB).textContent = s.scores[1];
@@ -153,7 +155,7 @@ function createBoard(root) {
     if (ev.ev === 'buzz') {
       cancelAnimationFrame(goTimer);
       const col = ev.team === 0 ? 'var(--teamA)' : 'var(--teamB)';
-      overlay(ev.name, `${s ? s.teams[ev.team] : ''}${ev.detail ? ' · ' + ev.detail : ''}`, col, 2600);
+      overlay(ev.name, `${s ? s.teams[ev.team] : ''}${ev.detail ? ' · ' + ev.detail : ''}`, col, 2600, col);
     }
   }
   return { render, event, overlay, hideOverlay };

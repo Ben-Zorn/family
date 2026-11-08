@@ -179,12 +179,16 @@ function onResult(m) {
   cancelAnimationFrame(rafId);
   const me = m.list.find(x => x.cid === cid);
   const w = m.list[0];
+  const col = m.winnerTeam === 0 ? 'var(--teamA)' : 'var(--teamB)';
+  document.documentElement.style.setProperty('--winCol', col); // winner's colour on every phone
   if (m.winner === cid) {
     state = 'win'; setState('win', 'Erster!', `${fmtMs(me.rt)}${m.list[1] ? ` · ${Math.round(m.list[1].rt - me.rt)} ms schneller` : ''}`);
     navigator.vibrate?.([120, 60, 120]);
   } else {
     state = 'lose';
-    setState('lose', 'Zu spät', me ? `${fmtMs(me.rt)} · ${Math.round(me.rt - w.rt)} ms langsamer` : 'Nicht gedrückt');
+    const who = m.winnerName || 'Das andere Team';
+    setState('lose', 'Zu spät', `${who} hat bereits gebuzzt` + (me ? ` · ${fmtMs(me.rt)} (${Math.round(me.rt - w.rt)} ms langsamer)` : ''));
+    navigator.vibrate?.(40);
   }
 }
 // pointerdown fires earliest; event.timeStamp is the hardware-ish event time on the same clock as performance.now()

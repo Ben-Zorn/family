@@ -231,7 +231,7 @@ function decide(corrected) {
   save(); renderAll();
   boardEvent({ ev: 'buzz', team: w.team, name: (corrected ? '(Korrektur) ' : '') + S.teams[w.team], detail });
   Snd.buzz();
-  broadcast({ t: 'result', id: A.id, winner: w.cid, list: A.buzzes.map(b => ({ cid: b.cid, team: b.team, rt: b.rt })) });
+  broadcast({ t: 'result', id: A.id, winner: w.cid, winnerTeam: w.team, winnerName: S.teams[w.team], list: A.buzzes.map(b => ({ cid: b.cid, team: b.team, rt: b.rt })) });
   showBuzzTimes(corrected);
 }
 function showBuzzTimes(corrected) {

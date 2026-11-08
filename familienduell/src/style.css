@@ -7,7 +7,9 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text)}
-body{background:radial-gradient(ellipse at 50% 0%,#14307a 0%,var(--bg) 70%) fixed}
+body{background:radial-gradient(ellipse at 50% 0%,#14307a 0%,var(--bg) 70%) fixed;transition:background .3s}
+body[data-win="0"]{background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--teamA) 55%,#000) 0%,color-mix(in srgb,var(--teamA) 18%,#000) 75%) fixed}
+body[data-win="1"]{background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--teamB) 55%,#000) 0%,color-mix(in srgb,var(--teamB) 18%,#000) 75%) fixed}
 button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:.55em 1em;background:#2a3a78;color:#fff;letter-spacing:.02em}
 button:hover{filter:brightness(1.15)}
 button:disabled{opacity:.35;cursor:default;filter:none}
@@ -116,15 +118,16 @@ kbd{font-family:ui-monospace,monospace;font-size:.75em;background:#0008;border:1
 .buzz-msg{font-size:6vmin;text-align:center;min-height:2.4em;font-family:system-ui,sans-serif}
 .buzz-foot{font-size:3.2vmin;color:var(--muted);text-align:center;font-family:system-ui,sans-serif}
 .st-idle #buzzBtn{background:#3a3f55}
-.st-ready{background:#3b3000!important}
+.st-ready{background:#1f1c10!important}
 .st-ready #buzzBtn{background:#d4a500}
-.st-go{background:#053d1d!important}
+.st-go{background:#10241a!important}
 .st-go #buzzBtn{background:#18c25c;box-shadow:0 2vmin 0 #0006,0 0 10vmin #2f8 }
 .st-locked #buzzBtn{background:#7a1a22}
 .st-pressed #buzzBtn{background:#555}
-.st-win{background:#4a3a00!important}
-.st-win #buzzBtn{background:linear-gradient(#ffe27a,#d29a00);color:#2b1a00}
-.st-lose #buzzBtn{background:#3a3f55}
+.st-win{background:color-mix(in srgb,var(--winCol,#d29a00) 45%,#000)!important}
+.st-lose{background:color-mix(in srgb,var(--winCol,#3a3f55) 30%,#000)!important}
+.st-win #buzzBtn{background:var(--winCol,#d29a00);color:#fff}
+.st-lose #buzzBtn{background:color-mix(in srgb,var(--winCol,#3a3f55) 55%,#222)}
 .join{max-width:420px;margin:10vh auto;padding:1.2em;display:grid;gap:.8em;font-family:system-ui,sans-serif}
 .join h1{font-family:"Oswald",system-ui;color:var(--gold);margin:0}
 .join input,.join button{font-size:1.2em;padding:.6em}
