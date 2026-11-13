@@ -2,43 +2,46 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06102b">
 <title>Familien-Duell – Spielleitung</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="host" id="host">
+<div class="host" id="host" data-view="ctrl">
   <div class="topbar">
     <span>Raum <b class="room" id="room">····</b></span>
     <span class="conn" id="peerStatus"><span class="dot"></span><span>Verbinde …</span></span>
     <span id="clients"></span>
     <span class="sp"></span>
-    <button id="btnQR">📱 Buzzer</button>
-    <button id="btnQuestions">🗂 Fragen</button>
-    <button id="btnSettings">⚙ Einstellungen</button>
+    <button id="btnQR" title="Buzzer verbinden">📱<span class="t"> Buzzer</span></button>
+    <button id="btnQuestions" title="Fragen">🗂<span class="t"> Fragen</span></button>
+    <button id="btnSettings" title="Einstellungen">⚙<span class="t"> Einstellungen</span></button>
     <button id="btnPop">🖥 Board-Fenster</button>
-    <button id="btnFull">⛶</button>
+    <button id="btnFull" title="Vollbild">⛶</button>
   </div>
 
   <div id="boardWrap"></div>
 
+  <div class="mscore" id="mScore"></div>
+
   <div class="gm" id="gm">
     <div class="row">
       <span class="lbl">Frage</span>
-      <button class="gold" id="btnNext">Neue Frage<kbd>N</kbd></button>
-      <button id="btnSkip">Überspringen<kbd>S</kbd></button>
-      <label>Punkte ×<select id="mult"><option>1</option><option>2</option><option>3</option></select></label>
+      <div class="grp"><button class="gold" id="btnNext">Neue Frage<kbd>N</kbd></button>
+      <button id="btnSkip">Überspringen<kbd>S</kbd></button></div>
+      <div class="grp"><label class="multl">Punkte ×<select id="mult"><option>1</option><option>2</option><option>3</option></select></label>
       <span class="info muted" id="qInfo"></span>
       <span class="sp" style="flex:1"></span>
-      <button id="btnUndo">↶ Rückgängig<kbd>Z</kbd></button>
+      <button id="btnUndo">↶ Rückgängig<kbd>Z</kbd></button></div>
     </div>
-    <div class="row"><span class="lbl">Text</span><span id="gmQ" style="font-size:1.15em"></span></div>
+    <div class="row qrow"><span class="lbl">Text</span><span id="gmQ" style="font-size:1.15em"></span></div>
     <div class="row">
       <span class="lbl">Buzzer</span>
-      <button class="green" id="btnArm">Buzzer freigeben<kbd>Leertaste</kbd></button>
-      <button id="btnDisarm">Sperren<kbd>Esc</kbd></button>
+      <div class="grp"><button class="green" id="btnArm">Buzzer freigeben<kbd>Leertaste</kbd></button>
+      <button id="btnDisarm">Sperren<kbd>Esc</kbd></button></div>
       <span class="buzzres" id="buzzRes">–</span>
     </div>
     <div class="row">
@@ -48,21 +51,26 @@
     </div>
     <div class="row">
       <span class="lbl">Runde</span>
-      <button class="red" id="btnStrike">✕ Falsch<kbd>X</kbd></button>
-      <button class="a" id="btnCtrlA">Team A spielt</button>
-      <button class="b" id="btnCtrlB">Team B spielt</button>
-      <span style="width:1em"></span>
-      <button class="green" id="btnStealOk">Klauen ✓</button>
-      <button class="red" id="btnStealFail">Klauen ✗</button>
-      <span style="width:1em"></span>
-      <button id="btnAwardA">Punkte → A</button>
-      <button id="btnAwardB">Punkte → B</button>
-      <button id="btnRest">Rest aufdecken</button>
+      <div class="grp one"><button class="red" id="btnStrike">✕ Falsch<kbd>X</kbd></button></div>
+      <div class="grp"><button class="a" id="btnCtrlA">Team A spielt</button>
+      <button class="b" id="btnCtrlB">Team B spielt</button></div>
+      <span class="gap"></span>
+      <div class="grp"><button class="green" id="btnStealOk">Klauen ✓</button>
+      <button class="red" id="btnStealFail">Klauen ✗</button></div>
+      <span class="gap"></span>
+      <div class="grp"><button id="btnAwardA">Punkte → A</button>
+      <button id="btnAwardB">Punkte → B</button></div>
+      <div class="grp one"><button id="btnRest">Rest aufdecken</button></div>
       <span class="sp" style="flex:1"></span>
-      <button id="btnScore">Punktestand korrigieren</button>
-      <button id="btnEnd">Spiel beenden</button>
+      <div class="grp"><button id="btnScore">Punktestand korrigieren</button>
+      <button id="btnEnd">Spiel beenden</button></div>
     </div>
   </div>
+
+  <nav class="mtabs" id="mTabs">
+    <button data-view="ctrl">🎛 Steuerung</button>
+    <button data-view="board">📺 Board</button>
+  </nav>
 </div>
 
 <!-- Modals -->

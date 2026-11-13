@@ -270,6 +270,15 @@ function renderAll() {
   $('#btnUndo').disabled = !undoStack.length;
   $('#mult').value = String(S.mult);
   $('#qInfo').textContent = S.q ? `Runde ${S.round} · ${S.q.topic} · ${TONES[S.q.tone] || ''} · noch ${pool().length} Fragen` : `${pool().length} Fragen verfügbar`;
+  renderMScore();
+}
+// Compact score strip shown above the controls on phones
+function renderMScore() {
+  const at = S.phase === 'play' ? S.control : S.phase === 'steal' ? 1 - S.control : null;
+  const team = t => `<div class="ms-t ${t ? 'B' : 'A'}${at === t ? ' active' : ''}"><span class="n">${esc(S.teams[t])}</span><b>${S.scores[t]}</b></div>`;
+  const sub = S.phase === 'idle' || S.phase === 'over' || !S.round ? '' : `Runde ${S.round}${S.mult > 1 ? ' · ×' + S.mult : ''}`;
+  $('#mScore').innerHTML = team(0) + `<div class="ms-bank"><b>${bankOf(S)}</b><span>${sub}</span></div>` + team(1) +
+    `<div class="ms-status">${statusHtml(S) || (S.phase === 'over' ? 'Spiel beendet' : '&nbsp;')}</div>`;
 }
 const missingTeams = () => [0, 1].filter(t => ![...clients.values()].some(c => c.team === t));
 function renderClients() {
@@ -381,6 +390,21 @@ $('#btnPeek').addEventListener('pointerdown', () => setPeek(true));
 $('#btnPop').onclick = () => window.open('board.html', 'fdboard', 'popup,width=1280,height=720');
 $('#btnFull').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); };
 document.addEventListener('pointerdown', Snd.unlock, { once: true });
+
+// Mobile: switch between controls and full board
+function setView(v) {
+  $('#host').dataset.view = v;
+  document.querySelectorAll('#mTabs button').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  try { localStorage.setItem('fd_view', v); } catch (e) {}
+}
+$('#mTabs').onclick = e => { const b = e.target.closest('button[data-view]'); if (b) setView(b.dataset.view); };
+setView((() => { try { return localStorage.getItem('fd_view'); } catch (e) { return null; } })() === 'board' ? 'board' : 'ctrl');
+
+// Keep the screen on (matters when the host runs on a phone)
+let wakeLock = null;
+async function keepAwake() { try { if (!wakeLock && navigator.wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } } catch (e) {} }
+document.addEventListener('pointerdown', keepAwake);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAwake(); });
 
 document.addEventListener('keydown', e => {
   if (e.target.matches('input,select,textarea') || e.ctrlKey || e.metaKey || e.altKey) return;

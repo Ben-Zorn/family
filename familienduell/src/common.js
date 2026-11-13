@@ -55,6 +55,18 @@ function bankOf(s) {
   return s.answers.reduce((t, a) => t + (a.st === 1 ? a.p : 0), 0) * (s.mult || 1);
 }
 
+// Status line (who plays, strikes, steal, award) – shared by board and mobile score strip
+function statusHtml(s) {
+  const teamCol = t => (t === 0 ? 'var(--teamA)' : 'var(--teamB)');
+  let st = '';
+  const tn = t => esc(s.teams[t]);
+  if (s.phase === 'faceoff') st = s.buzz ? `⚡ <span style="color:${teamCol(s.buzz.team)}">${esc(s.buzz.name)}</span> war schneller!` : 'Face-Off!';
+  if (s.phase === 'play') st = `<span style="color:${teamCol(s.control)}">${tn(s.control)}</span> spielt <span class="b-mini-strikes">${[1, 2, 3].map(n => `<i class="${s.strikes >= n ? 'on' : ''}">✕</i>`).join('')}</span>`;
+  if (s.phase === 'steal') st = `<span style="color:${teamCol(1 - s.control)}">${tn(1 - s.control)}</span> darf klauen!`;
+  if (s.phase === 'done' && s.award) st = s.award.pts ? `+${s.award.pts} Punkte für <span style="color:${teamCol(s.award.team)}">${tn(s.award.team)}</span>` : 'Runde beendet';
+  return st;
+}
+
 // ---------- Board renderer (used in host page and pop-out window) ----------
 function createBoard(root) {
   root.innerHTML = `
@@ -131,13 +143,7 @@ function createBoard(root) {
     } else {
       el.q.textContent = s.showQ && s.qShown ? s.q.text : '';
     }
-    let st = '';
-    const tn = t => esc(s.teams[t]);
-    if (s.phase === 'faceoff') st = s.buzz ? `⚡ <span style="color:${teamCol(s.buzz.team)}">${esc(s.buzz.name)}</span> war schneller!` : 'Face-Off!';
-    if (s.phase === 'play') st = `<span style="color:${teamCol(s.control)}">${tn(s.control)}</span> spielt <span class="b-mini-strikes">${[1, 2, 3].map(n => `<i class="${s.strikes >= n ? 'on' : ''}">✕</i>`).join('')}</span>`;
-    if (s.phase === 'steal') st = `<span style="color:${teamCol(1 - s.control)}">${tn(1 - s.control)}</span> darf klauen!`;
-    if (s.phase === 'done' && s.award) st = s.award.pts ? `+${s.award.pts} Punkte für <span style="color:${teamCol(s.award.team)}">${tn(s.award.team)}</span>` : 'Runde beendet';
-    el.status.innerHTML = st;
+    el.status.innerHTML = statusHtml(s);
 
     const ans = s.answers || [];
     const qChanged = lastQ !== (s.q && s.q.id);
